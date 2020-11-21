@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+
+$mono-font-family: "Fira Code", "SFMono-Regular", Menlo, Consolas, Monospace;
+
+$pink-000: #f1a9c9;
+$pink-100: #ea7ead;
+$pink-200: #e35392;
+$pink-300: #dc2877;
+
+$sky-000: #b1f5fb;
+$sky-100: #8af1f9;
+$sky-200: #63ecf7;
+$sky-300: #3ce7f5;
+
+$link-color: $pink-200;
+$btn-primary-color: $pink-100;
+
+$spacing-unit: 1.1rem; // 1rem == 16px
+
+$spacers: (
+        sp-0: 0,
+        sp-1: $spacing-unit * 0.5,
+        sp-2: $spacing-unit * 0.75,
+        sp-3: $spacing-unit,
+        sp-4: $spacing-unit * 1.5,
+        sp-5: $spacing-unit * 2,
+        sp-6: $spacing-unit * 2.5,
+        sp-7: $spacing-unit * 3,
+        sp-8: $spacing-unit * 3.5,
+        sp-9: $spacing-unit * 4,
+        sp-10: $spacing-unit * 5
+);

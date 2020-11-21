@@ -10,22 +10,10 @@ exclude: ["Gemfile", "Gemfile.lock", "CNAME", ".gitignore"]
 # Set a path/url to a logo that will be displayed instead of the title
 logo: "/assets/images/logo.svg"
 
-# Enable or disable the site search
-search_enabled: true
-
-# Set the search token separator for hyphenated-word search:
-search_tokenizer_separator: /[\s/]+/
-
-# Enable or disable heading anchors
-heading_anchors: true
-
 # Aux links for the upper right navigation
 aux_links:
   "Philly on GitHub":
     - "https://github.com/ricardoboss/philly"
 
-# Footer content appears at the bottom of every page's main content
-footer_content: "Copyright &copy; 2019-2020 Ricardo Boss. Distributed by an <a href=\"https://github.com/ricardoboss/Philly/tree/master/LICENSE\">MIT license.</a>"
-
-# Color scheme currently only supports "dark" or nil (default)
-color_scheme: nil
+# Color scheme supports "light" (default) and "dark"
+color_scheme: philly
