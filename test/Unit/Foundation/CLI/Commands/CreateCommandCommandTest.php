@@ -14,6 +14,18 @@ use PHPUnit\Framework\TestCase;
 
 class CreateCommandCommandTest extends TestCase
 {
+    public static function tearDownAfterClass(): void
+    {
+        $tmp = sys_get_temp_dir();
+
+        $tmpFiles = glob($tmp . DIRECTORY_SEPARATOR . "*.php");
+        if ($tmpFiles === false)
+            return;
+
+        foreach ($tmpFiles as $tmpFile)
+            unlink($tmpFile);
+    }
+
     public function testConstruct()
     {
         $cmd = new CreateCommandCommand();
@@ -23,100 +35,84 @@ class CreateCommandCommandTest extends TestCase
 
     public function testHandleRandomName()
     {
-        $fileLoc = null;
+        $cmd = new CreateCommandCommand();
+        $tmp = sys_get_temp_dir();
+        $ns = "App1\\test2\\Commands3";
 
-        try {
-            $cmd = new CreateCommandCommand();
-            $tmp = sys_get_temp_dir();
-            $ns = "App1\\test2\\Commands3";
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $rand = random_int(0, 99);
 
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $rand = random_int(0, 99);
+        $r = $cmd->handle(
+            CommandArgumentCollection::fromArray(
+                $cmd->getSignature()->getArguments(),
+                [
+                    'name' => "test$rand",
+                    'short' => "t",
+                    'args' => "arg1,arg2,arg3",
+                    'namespace' => $ns,
+                    'dest' => $tmp
+                ]
+            )
+        );
 
-            $r = $cmd->handle(
-                CommandArgumentCollection::fromArray(
-                    $cmd->getSignature()->getArguments(),
-                    [
-                        'name' => "test$rand",
-                        'short' => "t",
-                        'args' => "arg1,arg2,arg3",
-                        'namespace' => $ns,
-                        'dest' => $tmp
-                    ]
-                )
-            );
+        static::assertTrue($r->isSuccess());
+        static::assertNull($r->getThrowable());
+        static::assertIsString($r->getValue());
 
-            static::assertTrue($r->isSuccess());
-            static::assertNull($r->getThrowable());
-            static::assertIsString($r->getValue());
+        /** @var string $fileLoc */
+        $fileLoc = $r->getValue();
+        static::assertTrue(file_exists($fileLoc));
 
-            /** @var string $fileLoc */
-            $fileLoc = $r->getValue();
-            static::assertTrue(file_exists($fileLoc));
+        /** @noinspection PhpIncludeInspection */
+        include $fileLoc;
 
-            /** @noinspection PhpIncludeInspection */
-            include $fileLoc;
+        $classname = $ns . "\\Test{$rand}Command";
+        static::assertTrue(class_exists($classname));
 
-            $classname = $ns . "\\Test{$rand}Command";
-            static::assertTrue(class_exists($classname));
+        /** @var Command $c */
+        $c = new $classname();
+        static::assertInstanceOf(Command::class, $c);
 
-            /** @var Command $c */
-            $c = new $classname();
-            static::assertInstanceOf(Command::class, $c);
-
-            $genSig = $c->getSignature();
-            static::assertEquals("test$rand", $genSig->getName());
-        } finally {
-            if ($fileLoc !== null && file_exists($fileLoc)) {
-                unlink($fileLoc);
-            }
-        }
+        $genSig = $c->getSignature();
+        static::assertEquals("test$rand", $genSig->getName());
     }
 
     public function testHandleCustomClassname()
     {
-        $fileLoc = null;
+        $cmd = new CreateCommandCommand();
+        $tmp = sys_get_temp_dir();
+        $ns = "App1\\test2\\Commands3";
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $rand = random_int(0, 99);
+        $cn = "Other{$rand}Command";
 
-        try {
-            $cmd = new CreateCommandCommand();
-            $tmp = sys_get_temp_dir();
-            $ns = "App1\\test2\\Commands3";
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $rand = random_int(0, 99);
-            $cn = "Other{$rand}Command";
+        $r = $cmd->handle(
+            CommandArgumentCollection::fromArray(
+                $cmd->getSignature()->getArguments(),
+                [
+                    'name' => "test$rand",
+                    'short' => "t",
+                    'args' => "arg1,arg2,arg3",
+                    'namespace' => $ns,
+                    'dest' => $tmp,
+                    'classname' => $cn
+                ]
+            )
+        );
 
-            $r = $cmd->handle(
-                CommandArgumentCollection::fromArray(
-                    $cmd->getSignature()->getArguments(),
-                    [
-                        'name' => "test$rand",
-                        'short' => "t",
-                        'args' => "arg1,arg2,arg3",
-                        'namespace' => $ns,
-                        'dest' => $tmp,
-                        'classname' => $cn
-                    ]
-                )
-            );
+        static::assertTrue($r->isSuccess());
+        static::assertNull($r->getThrowable());
+        static::assertIsString($r->getValue());
 
-            static::assertTrue($r->isSuccess());
-            static::assertNull($r->getThrowable());
-            static::assertIsString($r->getValue());
+        /** @var string $fileLoc */
+        $fileLoc = $r->getValue();
+        static::assertTrue(file_exists($fileLoc));
 
-            /** @var string $fileLoc */
-            $fileLoc = $r->getValue();
-            static::assertTrue(file_exists($fileLoc));
+        /** @noinspection PhpIncludeInspection */
+        include $fileLoc;
 
-            /** @noinspection PhpIncludeInspection */
-            include $fileLoc;
-
-            $classname = $ns . "\\" . $cn;
-            static::assertTrue(class_exists($classname));
-        } finally {
-            if ($fileLoc !== null && file_exists($fileLoc)) {
-                unlink($fileLoc);
-            }
-        }
+        $classname = $ns . "\\" . $cn;
+        static::assertTrue(class_exists($classname));
     }
 
     public function testHandleInvalidStub()
@@ -169,48 +165,40 @@ class CreateCommandCommandTest extends TestCase
 
     public function testHandleEmptyArgs()
     {
-        $fileLoc = null;
+        $cmd = new CreateCommandCommand();
+        $tmp = sys_get_temp_dir();
+        $ns = "App1\\test2\\Commands3";
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $rand = random_int(0, 99);
+        $cn = "Other{$rand}Command";
 
-        try {
-            $cmd = new CreateCommandCommand();
-            $tmp = sys_get_temp_dir();
-            $ns = "App1\\test2\\Commands3";
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $rand = random_int(0, 99);
-            $cn = "Other{$rand}Command";
+        $r = $cmd->handle(
+            CommandArgumentCollection::fromArray(
+                $cmd->getSignature()->getArguments(),
+                [
+                    'name' => "test$rand",
+                    'short' => "t",
+                    'args' => ",,,arg1",
+                    'namespace' => $ns,
+                    'dest' => $tmp,
+                    'classname' => $cn
+                ]
+            )
+        );
 
-            $r = $cmd->handle(
-                CommandArgumentCollection::fromArray(
-                    $cmd->getSignature()->getArguments(),
-                    [
-                        'name' => "test$rand",
-                        'short' => "t",
-                        'args' => ",,,arg1",
-                        'namespace' => $ns,
-                        'dest' => $tmp,
-                        'classname' => $cn
-                    ]
-                )
-            );
+        static::assertTrue($r->isSuccess());
 
-            static::assertTrue($r->isSuccess());
+        /** @var string $fileLoc */
+        $fileLoc = $r->getValue();
 
-            /** @var string $fileLoc */
-            $fileLoc = $r->getValue();
+        /** @noinspection PhpIncludeInspection */
+        include $fileLoc;
 
-            /** @noinspection PhpIncludeInspection */
-            include $fileLoc;
-
-            $classname = $ns . "\\" . $cn;
-            /** @var Command $c */
-            $c = new $classname();
-            $genSig = $c->getSignature();
-            static::assertCount(1, $genSig->getArguments());
-        } finally {
-            if ($fileLoc !== null && file_exists($fileLoc)) {
-                unlink($fileLoc);
-            }
-        }
+        $classname = $ns . "\\" . $cn;
+        /** @var Command $c */
+        $c = new $classname();
+        $genSig = $c->getSignature();
+        static::assertCount(1, $genSig->getArguments());
     }
 
     public function testHandleInvalidDestination()
