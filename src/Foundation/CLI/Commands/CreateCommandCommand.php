@@ -102,7 +102,7 @@ class CreateCommandCommand extends Command
 
                 $success = false !== file_put_contents($filename, $stub);
             } else {
-                $success = $this->files["app-root"]->putContents($filename, $stub, overwrite: false);
+                $success = $this->files->get("app-root")->putContents($filename, $stub, overwrite: false);
             }
 
             if ($success) {
