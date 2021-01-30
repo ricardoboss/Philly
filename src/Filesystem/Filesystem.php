@@ -6,6 +6,7 @@ namespace Philly\Filesystem;
 
 use Philly\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Philly\Support\Str;
+use ricardoboss\Console;
 
 class Filesystem implements FilesystemContract
 {
@@ -80,7 +81,13 @@ class Filesystem implements FilesystemContract
         $result = fwrite($h, $content);
         fclose($h);
 
-        return $result !== false;
+        if ($result) {
+            Console::debug("Wrote new content to %s", Console::link($full));
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
