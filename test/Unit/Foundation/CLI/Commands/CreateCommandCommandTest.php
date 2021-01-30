@@ -19,11 +19,13 @@ class CreateCommandCommandTest extends TestCase
         $tmp = sys_get_temp_dir();
 
         $tmpFiles = glob($tmp . DIRECTORY_SEPARATOR . "*.php");
-        if ($tmpFiles === false)
+        if ($tmpFiles === false) {
             return;
+        }
 
-        foreach ($tmpFiles as $tmpFile)
+        foreach ($tmpFiles as $tmpFile) {
             unlink($tmpFile);
+        }
     }
 
     public function testConstruct()
