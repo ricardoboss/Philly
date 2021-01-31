@@ -48,7 +48,7 @@
   ],
   "scripts": {
     "test": "cross-env XDEBUG_MODE=coverage phpunit --configuration=phpunit.xml.dist --coverage-text",
-    "stan": "cross-env psalm --config=psalm.xml.dist --output-format=github --shepherd",
+    "psalm": "cross-env psalm --config=psalm.xml.dist --output-format=github --shepherd",
     "infect": "cross-env XDEBUG_MODE=coverage infection --configuration=infection.json.dist --no-progress"
   }
 }

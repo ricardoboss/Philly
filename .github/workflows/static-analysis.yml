@@ -34,4 +34,4 @@ jobs:
         COMPOSER_ROOT_VERSION: dev-master
 
     - name: Run Psalm (& publish to shepherd)
-      run: composer run-script stan
+      run: composer run-script psalm
