@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Philly;
 
+use InvalidArgumentException;
 use Philly\CLI\Commands\CommandCollection;
 use Philly\Container\BindingContainer;
 use Philly\Container\UnacceptableTypeException;
 use Philly\Contracts\App as AppContract;
 use Philly\Contracts\CLI\Commands\CommandCollection as CommandCollectionContract;
 use Philly\Contracts\Exceptions\ExceptionHandler as ExceptionHandlerContract;
+use Philly\Contracts\Filesystem\FilesService as FilesServiceContract;
 use Philly\Contracts\ServiceProvider\ServiceProviderContainer as ServiceProviderContainerContract;
 use Philly\Exceptions\ExceptionHandler;
-use Philly\Foundation\CLI\Commands\VersionCommand;
+use Philly\Filesystem\FilesService;
 use Philly\ServiceProvider\ServiceProviderContainer;
 
 /**
@@ -71,11 +73,18 @@ class App extends BindingContainer implements AppContract
     {
         $serviceContainer = $this->getLazySingleton(
             ServiceProviderContainerContract::class,
-            fn () => new ServiceProviderContainer()
+            function () {
+                $serviceContainer = new ServiceProviderContainer();
+
+                // register base services
+                $serviceContainer[FilesServiceContract::class] = new FilesService();
+
+                return $serviceContainer;
+            }
         );
 
         if (!($serviceContainer instanceof ServiceProviderContainerContract)) {
-            throw new UnacceptableTypeException("Invalid service provider container type!");
+            throw new UnacceptableTypeException(sprintf("Invalid service provider container type: %s!", get_class($serviceContainer)));
         }
 
         return $serviceContainer;
@@ -87,8 +96,7 @@ class App extends BindingContainer implements AppContract
     public function getCommands(): CommandCollectionContract
     {
         if (!$this->offsetExists(CommandCollectionContract::class)) {
-            $this->offsetSet(CommandCollectionContract::class, new CommandCollection());
-            $this->registerDefaultCommands();
+            $this[CommandCollectionContract::class] = new CommandCollection();
         }
 
         $commandCollection = $this->get(CommandCollectionContract::class);
@@ -100,9 +108,19 @@ class App extends BindingContainer implements AppContract
         return $commandCollection;
     }
 
-    private function registerDefaultCommands()
+    /**
+     * @inheritDoc
+     */
+    public function offsetGet($offset)
     {
-        $commandCollection = $this->getCommands();
-        $commandCollection->add(new VersionCommand());
+        if ($this->offsetExists($offset)) {
+            return parent::offsetGet($offset);
+        }
+
+        if ($this->getServices()->offsetExists($offset)) {
+            return $this->getServices()->offsetGet($offset);
+        }
+
+        throw new InvalidArgumentException("Service of type $offset not found in app container.");
     }
 }

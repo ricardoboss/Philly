@@ -15,4 +15,9 @@ interface ServiceProviderContainer extends BindingContainer
      * Boots all registered services.
      */
     public function boot(): void;
+
+    /**
+     * @return bool Whether boot() has been called.
+     */
+    public function isBooted(): bool;
 }

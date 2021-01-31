@@ -94,4 +94,37 @@ class QueueTest extends TestCase
         static::assertEquals("[1,2]", $json_enc);
         static::assertEquals($json_enc, $json_as);
     }
+
+    public function testCopy()
+    {
+        $queue = new Queue();
+        $a = new TestClass();
+        $a->field = "a";
+        $b = new TestClass();
+        $b->field = "b";
+        $c = new TestClass();
+        $c->field = "c";
+
+        $queue->enqueue($a, $b, $c);
+
+        $deep_copy = $queue->copy();
+
+        static::assertNotSame($queue, $deep_copy);
+
+        $o_a = $queue->dequeue();
+        $c_a = $deep_copy->dequeue();
+
+        static::assertSame($o_a, $a);
+        static::assertNotSame($o_a, $c_a);
+
+        $shallow_copy = $queue->copy(false);
+
+        static::assertNotSame($queue, $shallow_copy);
+
+        $o_b = $queue->dequeue();
+        $c_b = $shallow_copy->dequeue();
+
+        static::assertSame($o_b, $b);
+        static::assertSame($o_b, $c_b);
+    }
 }

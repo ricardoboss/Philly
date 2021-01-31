@@ -9,19 +9,7 @@ if (PHP_SAPI != 'cli') {
     exit(1);
 }
 
-$autoload = "vendor" . DIRECTORY_SEPARATOR . "autoload.php";
-for ($i = 0; $i < 10 && realpath($autoload) === false; $i++) {
-    $autoload = ".." . DIRECTORY_SEPARATOR . $autoload;
-}
-
-if (realpath($autoload) === false) {
-    echo PHP_EOL . 'Could not find autoload.php' . PHP_EOL;
-
-    exit(1);
-}
-
-/** @noinspection PhpIncludeInspection */
-require $autoload;
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 /******************************************************************************/
 
@@ -29,40 +17,60 @@ use Philly\App;
 use Philly\CLI\Commands\CommandArgument;
 use Philly\CLI\Commands\CommandArgumentCollection;
 use Philly\Contracts\CLI\Commands\Command as CommandContract;
+use Philly\Contracts\CLI\Commands\CommandArgumentTemplate as CommandArgumentTemplateContract;
+use Philly\Contracts\CLI\Commands\CommandArgumentTemplateCollection as CommandArgumentTemplateCollectionContract;
 use Philly\Queue\Queue;
+use ricardoboss\Console;
+
+Console::info(Console::magenta("Philly") . Console::blue("CLI") . " v" . Console::bold(App::VERSION));
 
 $app = App::inst();
-$commands = $app->getCommands();
 
 $args = new Queue($argv);
 
-// remove path to bin
+// path to bin
 $args->dequeue();
 
 if ($args->isEmpty()) {
-    echo 'To see a list of available commands, please run the "list" command' . PHP_EOL;
+    Console::warn('No command given. Showing all available commands.');
 
-    exit(1);
+    // pass "list" as first argument
+    $commandString = "list";
+} else {
+    // get first argument
+    $commandString = $args->dequeue();
 }
 
-// get first argument
-$commandString = $args->dequeue();
-
-/** @var CommandContract $command */
-$command = $commands->first(function (CommandContract $command) use ($commandString) {
-    return $commandString === $command->getSignature()->getName();
-});
+/** @var CommandContract|null $command */
+$command = $app
+        ->getCommands()
+        ->first(function (CommandContract $command) use ($commandString) {
+            return $commandString === $command->getSignature()->getName();
+        });
 
 if ($command === null) {
-    echo 'Unknown command: ' . $commandString . PHP_EOL;
+    Console::error('Unknown command: %s', $commandString);
 
-    exit(1);
+    exit(2);
 }
 
+/** @var CommandArgumentTemplateContract[]|CommandArgumentTemplateCollectionContract $templates */
 $templates = $command->getSignature()->getArguments();
 $arguments = new CommandArgumentCollection();
-foreach ($args as $arg) {
-    $argument = new CommandArgument($templates->get($i), $arg);
+foreach ($templates as $template) {
+    if ($args->isEmpty()) {
+        if (!$template->isOptional()) {
+            Console::error("Value for required argument \"{$template->getName()}\" is missing.");
+
+            exit(3);
+        } else {
+            $value = $template->getDefaultValue();
+        }
+    } else {
+        $value = $args->dequeue();
+    }
+
+    $argument = new CommandArgument($template, $value);
 
     $arguments->add($argument);
 }
@@ -70,7 +78,7 @@ foreach ($args as $arg) {
 $result = $command->handle($arguments);
 
 if (!$result->isSuccess()) {
-    echo 'Command was not successful.' . PHP_EOL;
+    Console::error('Command was not successful.');
 
     if (($throwable = $result->getThrowable()) !== null) {
         echo $throwable->getMessage() . PHP_EOL;

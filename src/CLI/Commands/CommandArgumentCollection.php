@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Philly\CLI\Commands;
 
+use InvalidArgumentException;
+use Philly\Container\OffsetNotFoundException;
 use Philly\Contracts\CLI\Commands\CommandArgument as CommandArgumentContract;
 use Philly\Contracts\CLI\Commands\CommandArgumentCollection as CommandArgumentCollectionContract;
+use Philly\Contracts\CLI\Commands\CommandArgumentTemplate as CommandArgumentTemplateContract;
 use Philly\Contracts\CLI\Commands\CommandArgumentTemplateCollection as CommandArgumentTemplateCollectionContract;
 
 class CommandArgumentCollection extends CommandArgumentTemplateCollection implements CommandArgumentCollectionContract
@@ -14,13 +17,19 @@ class CommandArgumentCollection extends CommandArgumentTemplateCollection implem
     {
         $collection = new CommandArgumentCollection();
 
-        foreach ($args as $k => $v) {
-            $template = $argumentTemplateCollection->firstKey($k);
-            if ($template == false) {
-                continue;
+        /** @var CommandArgumentTemplateContract $template */
+        foreach ($argumentTemplateCollection as $template) {
+            if (array_key_exists($template->getName(), $args)) {
+                $value = $args[$template->getName()];
+            } elseif (array_key_exists($template->getShortName(), $args)) {
+                $value = $args[$template->getShortName()];
+            } elseif ($template->isOptional()) {
+                $value = $template->getDefaultValue();
+            } else {
+                throw new InvalidArgumentException("Argument {$template->getName()} is required but no value was supplied.");
             }
 
-            $arg = new CommandArgument($template, $v);
+            $arg = new CommandArgument($template, $value);
             $collection->add($arg);
         }
 
@@ -38,13 +47,13 @@ class CommandArgumentCollection extends CommandArgumentTemplateCollection implem
     /**
      * @inheritDoc
      */
-    public function getValue(string $key, $default = null)
+    public function getValue(string $key)
     {
         /** @var CommandArgumentContract $arg */
-        $arg = parent::firstKey($key, null);
+        $arg = parent::firstKey($key);
 
         if ($arg === null) {
-            return $default;
+            throw new OffsetNotFoundException($key);
         }
 
         return $arg->getValue();

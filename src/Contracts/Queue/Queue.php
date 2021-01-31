@@ -41,4 +41,12 @@ interface Queue extends Traversable, IteratorAggregate, Storage
      * @inheritDoc
      */
     public function getIterator(): QueueIterator;
+
+    /**
+     * Copies this queue.
+     *
+     * @param bool $deep Whether to do a deep copy (also clones every single elements).
+     * @return Queue A new queue instance containing similar elements as the original.
+     */
+    public function copy(bool $deep = true): self;
 }

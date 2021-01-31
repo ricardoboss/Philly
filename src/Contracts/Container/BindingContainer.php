@@ -33,7 +33,7 @@ interface BindingContainer extends Container
      * Get a value from the container or a default value if the key doesn't exist.
      * Implementations should store the default value with the given key if it didn't exist yet, hence the "lazy" term.
      *
-     * Multiple calls to this method with the same(!) arguments should result in the same outputs.
+     * Multiple calls to this method with the same key result in the same outputs.
      *
      * @param int|string|float $key
      * @param Closure|mixed $default A builder or the default instance. The builder will only be called if the key does

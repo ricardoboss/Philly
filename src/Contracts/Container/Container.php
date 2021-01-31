@@ -11,7 +11,7 @@ use Psr\Container\ContainerInterface;
 use Traversable;
 
 /**
- * Interface Container
+ * Interface Container.
  */
 interface Container extends ContainerInterface, ArrayAccess, Traversable, IteratorAggregate, Storage
 {
@@ -68,4 +68,12 @@ interface Container extends ContainerInterface, ArrayAccess, Traversable, Iterat
      * @inheritDoc
      */
     public function getIterator(): ContainerIterator;
+
+    /**
+     * Copies this container and its contents.
+     *
+     * @param bool $deep Whether to do a deep copy (also clones every single elements).
+     * @return Container A new container instance containing similar elements as the original.
+     */
+    public function copy(bool $deep = true): self;
 }

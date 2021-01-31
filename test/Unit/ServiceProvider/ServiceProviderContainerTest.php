@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace test\Philly\Unit\ServiceProvider;
 
-use Philly\ServiceProvider\ServiceProviderContainer;
 use Philly\Container\UnacceptableBindingException;
+use Philly\ServiceProvider\AlreadyBootedException;
+use Philly\ServiceProvider\ServiceProviderContainer;
 use PHPUnit\Framework\TestCase;
 use test\Philly\TestClass;
 use test\Philly\TestInterface;
@@ -48,17 +49,34 @@ class ServiceProviderContainerTest extends TestCase
         $container = new ServiceProviderContainer();
         $serviceProvider = new TestServiceProvider();
 
+        static::assertFalse($container->isBooted());
         static::assertFalse($serviceProvider->isRegistered());
         static::assertFalse($serviceProvider->isBooted());
 
         $container[TestInterface::class] = $serviceProvider;
 
+        static::assertFalse($container->isBooted());
         static::assertTrue($serviceProvider->isRegistered());
         static::assertFalse($serviceProvider->isBooted());
 
         $container->boot();
 
+        static::assertTrue($container->isBooted());
         static::assertTrue($serviceProvider->isRegistered());
         static::assertTrue($serviceProvider->isBooted());
+
+        static::expectException(AlreadyBootedException::class);
+
+        $container->boot();
+    }
+
+    public function testBindAfterBoot()
+    {
+        $container = new ServiceProviderContainer();
+        $container->boot();
+
+        static::expectException(AlreadyBootedException::class);
+
+        $container[TestInterface::class] = new TestServiceProvider();
     }
 }

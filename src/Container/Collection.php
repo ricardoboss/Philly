@@ -103,7 +103,7 @@ class Collection extends Container implements CollectionContract
                 return reset($this->storage);
             }
 
-            foreach ($this as $key => $value) {
+            foreach ($this->storage as $key => $value) {
                 if (($callback($value, $key)) === true) {
                     return $value;
                 }

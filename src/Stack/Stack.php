@@ -64,23 +64,52 @@ class Stack implements StackContract
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function isEmpty(): bool
     {
         return $this->stack->isEmpty();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function count(): int
     {
         return $this->stack->count();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function clear(): void
     {
         $this->stack->clear();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function jsonSerialize()
     {
         return $this->stack->jsonSerialize();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function copy(bool $deep = true): self
+    {
+        if (!$deep) {
+            return new self(array_reverse($this->stack->toArray()));
+        }
+
+        $copy = new self();
+        foreach (array_reverse($this->stack->toArray()) as $item) {
+            $copy->stack[] = clone $item;
+        }
+
+        return $copy;
     }
 }

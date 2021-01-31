@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Philly\ServiceProvider;
 
+use JetBrains\PhpStorm\Pure;
 use Philly\Contracts\ServiceProvider\ServiceProvider as ServiceProviderContract;
 use RuntimeException;
 use Throwable;
@@ -18,7 +19,7 @@ class AlreadyBootedException extends RuntimeException
      *
      * @param string|ServiceProviderContract $serviceProvider The message or the contract which was already booted.
      */
-    public function __construct($serviceProvider, int $code = 0, Throwable $previous = null)
+    #[Pure] public function __construct(string|ServiceProviderContract $serviceProvider, int $code = 0, Throwable $previous = null)
     {
         if ($serviceProvider instanceof ServiceProviderContract) {
             $name = get_class($serviceProvider);

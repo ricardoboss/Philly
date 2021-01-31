@@ -56,4 +56,21 @@ class Storage implements StorageContract
 
         $this->storage = [];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function copy(bool $deep = true): StorageContract
+    {
+        if (!$deep) {
+            return new self($this->storage);
+        }
+
+        $copy = new self();
+        foreach ($this->storage as $k => $v) {
+            $copy->storage[$k] = clone $v;
+        }
+
+        return $copy;
+    }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Philly\ServiceProvider;
 
 use Philly\Contracts\ServiceProvider\ServiceProvider as ServiceProviderContract;
+use ricardoboss\Console;
 
 /**
  * Class ServiceProvider.
@@ -35,6 +36,8 @@ abstract class ServiceProvider implements ServiceProviderContract
         }
 
         $this->registered = true;
+
+        Console::debug("Service provider " . get_class($this) . " registered.");
     }
 
     /**
@@ -59,5 +62,7 @@ abstract class ServiceProvider implements ServiceProviderContract
         }
 
         $this->booted = true;
+
+        Console::debug("Service provider " . get_class($this) . " booted.");
     }
 }

@@ -38,4 +38,12 @@ interface Stack extends Traversable, IteratorAggregate, Storage
      * @inheritDoc
      */
     public function getIterator(): StackIterator;
+
+    /**
+     * Copies this stack.
+     *
+     * @param bool $deep Whether to do a deep copy (also clones every single elements).
+     * @return Stack A new stack instance containing similar elements as the original.
+     */
+    public function copy(bool $deep = true): self;
 }

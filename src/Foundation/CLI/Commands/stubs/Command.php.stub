@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+namespace $STUB_NAMESPACE;
+
+use Philly\App;
+use Philly\CLI\Commands\Command;
+use Philly\CLI\Commands\CommandResult;
+use Philly\CLI\Commands\CommandSignature;
+use Philly\CLI\Commands\CommandArgumentTemplate;
+use Philly\Contracts\CLI\Commands\CommandArgumentCollection as CommandArgumentCollectionContract;
+use Philly\Contracts\CLI\Commands\CommandResult as CommandResultContract;
+
+/**
+ * Class $STUB_CLASS_NAME.
+ */
+class $STUB_CLASS_NAME extends Command
+{
+    /**
+     * @inheritDoc
+     */
+    public function __construct()
+    {
+        parent::__construct($STUB_COMMAND_SIGNATURE);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function handle(CommandArgumentCollectionContract $args): CommandResultContract
+    {
+        // TODO: Implement handle() method.
+    }
+}

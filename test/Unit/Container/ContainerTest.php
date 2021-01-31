@@ -208,4 +208,23 @@ class ContainerTest extends TestCase
 
         static::assertTrue($container->isEmpty());
     }
+
+    public function testCopy()
+    {
+        $a = new TestClass();
+
+        $container = new TestContainer([
+            TestInterface::class => $a
+        ]);
+
+        $deep_copy = $container->copy();
+        $deep_a = $deep_copy[TestInterface::class];
+
+        static::assertNotSame($a, $deep_a);
+
+        $shallow_copy = $container->copy(false);
+        $shallow_a = $shallow_copy[TestInterface::class];
+
+        static::assertSame($a, $shallow_a);
+    }
 }

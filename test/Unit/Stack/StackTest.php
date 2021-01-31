@@ -90,4 +90,37 @@ class StackTest extends TestCase
 
         static::assertTrue($stack->isEmpty());
     }
+
+    public function testCopy()
+    {
+        $stack = new Stack();
+        $a = new TestClass();
+        $a->field = "a";
+        $b = new TestClass();
+        $b->field = "b";
+        $c = new TestClass();
+        $c->field = "c";
+
+        $stack->push($c, $b, $a);
+
+        $deep_copy = $stack->copy();
+
+        static::assertNotSame($stack, $deep_copy);
+
+        $o_a = $stack->pop();
+        $c_a = $deep_copy->pop();
+
+        static::assertSame($o_a, $a);
+        static::assertNotSame($o_a, $c_a);
+
+        $shallow_copy = $stack->copy(false);
+
+        static::assertNotSame($stack, $shallow_copy);
+
+        $o_b = $stack->pop();
+        $c_b = $shallow_copy->pop();
+
+        static::assertSame($o_b, $b);
+        static::assertSame($o_b, $c_b);
+    }
 }

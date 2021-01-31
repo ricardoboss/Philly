@@ -85,7 +85,7 @@ class Container extends Storage implements ContainerContract
                 $type = gettype($value);
             }
 
-            throw new UnacceptableTypeException($type);
+            throw new UnacceptableTypeException(type: $type);
         }
 
         if ($offset !== null) {
@@ -163,5 +163,22 @@ class Container extends Storage implements ContainerContract
         $this->offsetSet($key, $default);
 
         return $default;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function copy(bool $deep = true): ContainerContract
+    {
+        if (!$deep) {
+            return new self($this->storage);
+        }
+
+        $copy = new self();
+        foreach ($this->storage as $k => $v) {
+            $copy->storage[$k] = clone $v;
+        }
+
+        return $copy;
     }
 }
