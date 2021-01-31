@@ -62,7 +62,7 @@ class ServeCommand extends Command
         $exitCode = $process->wait(function ($type, $buffer) {
             $messages = array_filter(
                 mb_split("\r?\n", $buffer),
-                fn($v) => strlen($v) > 0,
+                fn ($v) => strlen($v) > 0,
                 ARRAY_FILTER_USE_BOTH
             );
 
@@ -88,8 +88,9 @@ class ServeCommand extends Command
             "$host:$port"
         ];
 
-        if ($root !== null)
+        if ($root !== null) {
             array_push($result, "-t", $root);
+        }
 
         return $result;
     }
