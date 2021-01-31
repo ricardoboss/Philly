@@ -8,6 +8,7 @@ use Philly\Container\Collection;
 use Philly\Contracts\CLI\Commands\Command as CommandContract;
 use Philly\Contracts\CLI\Commands\CommandCollection as CommandCollectionContract;
 use Philly\Foundation\CLI\Commands\CreateCommandCommand;
+use Philly\Foundation\CLI\Commands\ServeCommand;
 use Philly\Foundation\CLI\Commands\VersionCommand;
 
 /**
@@ -22,7 +23,8 @@ class CommandCollection extends Collection implements CommandCollectionContract
             array_unshift(
                 $items,
                 new VersionCommand(),
-                new CreateCommandCommand()
+                new CreateCommandCommand(),
+                new ServeCommand()
             );
         }
 
